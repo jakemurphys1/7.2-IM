@@ -5823,7 +5823,7 @@ h1 {
 
 .container {
   width: 300px;
-  height: 400px;
+  height: auto;
   margin: 0 auto; }
 
 form {
@@ -5832,6 +5832,15 @@ form {
 #textContainer {
   border: solid black 1px;
   width: 300px;
-  height: 400px; }
+  height: 400px;
+  overflow: scroll; }
+
+.Login {
+  border: solid 1px black;
+  width: 200px; }
+
+.Signin {
+  border: solid 1px black;
+  width: 200px; }
 
 /*# sourceMappingURL=app.css.map */
