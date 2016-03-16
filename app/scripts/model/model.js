@@ -4,13 +4,13 @@ var Backbone = require("backbone");
 var $ = require("jquery")
 
 var Model = Backbone.Model.extend({
-urlRoot:"http://tiny-lasagna-server.herokuapp.com/collections/messages-Jake",
+urlRoot:"http://tiny-lasagna-server.herokuapp.com/collections/messages",
    idAttribute: "_id",
 });
 
 var ModelCollection = Backbone.Collection.extend({
   model:Model,
-  url:"http://tiny-lasagna-server.herokuapp.com/collections/messages-Jake",
+  url:"http://tiny-lasagna-server.herokuapp.com/collections/messages",
 });
 
 var UserModel = Backbone.Model.extend({

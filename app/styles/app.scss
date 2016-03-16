@@ -16,7 +16,7 @@ img {
   max-width: 100%;
 }
 body{
-
+background-image: url("http://wallpapercave.com/wp/CyT83yY.jpg");
 }
 
 h1{
@@ -25,7 +25,7 @@ h1{
 }
 
 .container{
-  width:300px;
+  width:80%;
   height:auto;
   margin:0 auto;
 }
@@ -36,16 +36,39 @@ form{
 
 #textContainer{
   border:solid black 1px;
-  width:300px;
+  width:100%;
   height:400px;
      overflow: scroll;
+       background-color: white;
 }
 
 .Login{
+  margin-top: 30px;
   border:solid 1px black;
   width:200px;
+  text-align: center;
+  background-color: white;
 }
 .Signin{
+    margin-top: 30px;
   border:solid 1px black;
     width:200px;
+      text-align: center;
+      background-color: white;
+}
+
+.allMessages li{
+   list-style-type: none;
+}
+
+.all{
+
+  border:black solid 1px;
+  background-color: lightblue;
+}
+
+#InputHere{
+  width:800px;
+  margin-top:20px;
+  margin-bottom: 20px;
 }

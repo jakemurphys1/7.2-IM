@@ -24,6 +24,8 @@ var UserForm = React.createClass({
     }
     var thisname = {name:$("#NameHere").val(),username:$("#UsernameHere").val(),password:$("#PasswordHere").val()}
     this.props.collection.create(thisname);
+      localStorage.setItem("UserName", $("#UsernameHere").val());
+      ReactDOM.render(<TheInput collection={myCollection} model={myModel}/>,document.getElementById("container"))
   },
   render: function(){
     return(
@@ -42,6 +44,9 @@ var UserForm = React.createClass({
 });
 
 var LogForm = React.createClass({
+  handleNew:function(){
+    ReactDOM.render(<UserForm collection={this.props.collection} />,document.getElementById("container"))
+  },
   handleSubmit:function(e){
     e.preventDefault();
     var CurUsername = $("#UsernameHere").val();
@@ -61,21 +66,24 @@ var LogForm = React.createClass({
             } else{
               myCollection.fetch();
               ReactDOM.render(<TheInput CurrentUser={CurUsername} collection={myCollection} model={myModel}/>,document.getElementById("container"))
+              localStorage.setItem("UserName", CurUsername);
             }
       })
   },
     render:function(){
+      var curUser = localStorage.getItem("UserName");
         return(
           <div className="Login">
           <label>Sign In</label>
-          <form onSubmit={this.handleSubmit}>
+          <form>
               <input type = "text" id="UsernameHere" placeholder="UserName"/>
               <input type = "text" id="PasswordHere" placeholder="Password"/>
-              <button className = "btn btn-primary">Log In</button>
           </form>
+          <div><button onClick={this.handleSubmit} className = "btn btn-primary">Log In</button>
+          <button onClick={this.handleNew} className = "btn btn-secondary">Create New</button></div>
           </div>
         )
     },
 })
 
-module.exports=UserForm;
+module.exports=LogForm;

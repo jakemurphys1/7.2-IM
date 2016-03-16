@@ -8,27 +8,69 @@ var Input = require("react-bootstrap/lib/Input")
 
 var InputList = React.createClass({displayName: "InputList",
   mixins:[Backbone.React.Component.mixin],
-  handleChange:function(){
 
-  },
+  IsValidImageUrl:function(url) {
+    var result =true;
+    $("<img>", {
+        src: url,
+        error: function() {console.log("hi"); result = false},
+        load: function() {console.log("hi");  result = true}
+    });
+    return result;
+},
+componentDidMount:function(){
+  var thiscollection = this.props.collection;
+  setInterval(function(){
+  this.props.collection.fetch();
+  }.bind(this),3000)
+},
   handleSubmit:function(e){
     e.preventDefault();
-      var addNew = {"Message":$("#InputHere").val(),"Time":Date.now(),"Username":this.props.CurrentUser}
+// var message = $("#InputHere").val();
+// var isImage=false;
+// var firstLetters = message.substring(0,6)
+
+  //if(firstLetters=="https:"){
+      // var isImage = this.IsValidImageUrl(message)
+      // console.log(isImage)
+  //}
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+  if(dd<10){
+      dd='0'+dd
+  }
+  if(mm<10){
+      mm='0'+mm
+  }
+  today = mm+'/'+dd+'/'+yyyy;
+
+      var addNew = {"content":$("#InputHere").val(),"time":today,"username":this.props.CurrentUser}
       this.props.collection.create(addNew)
+      $("#InputHere").val("");
   },
   render:function(){
 
 
       var allMessages= this.props.collection.map(function(model){
-        return (React.createElement("li", null, model.get("Message")))
+        if(model.get("content")==undefined){
+
+        }else{
+          return (React.createElement("li", {className: "allMessages"}, model.get("content"), " - written by ", model.get("username"), " on ", model.get("time")))
+        }
+
+
       });
       allMessages=allMessages.reverse();
+
+      var curUser = localStorage.getItem("UserName");
       return(
             React.createElement("div", {className: "all"}, 
                   React.createElement("h1", null, "JakeChat"), 
-                  React.createElement("h2", null, this.props.CurrentUser), 
+                  React.createElement("h2", null, "User: ", curUser), 
                 React.createElement("div", {id: "textContainer"}, 
-                  React.createElement("ul", null, 
+                  React.createElement("ul", {className: "allMessages"}, 
                     allMessages
                   )
                 ), 
@@ -48,7 +90,7 @@ var InputList = React.createClass({displayName: "InputList",
 
 var MessageItem = React.createClass({displayName: "MessageItem",
 render:function(){
-return(React.createElement("li", null, "hi", this.props.model.get("Message")))
+return(React.createElement("li", null, "hi", this.props.model.get("content")))
 }
 })
 
@@ -82,6 +124,8 @@ var UserForm = React.createClass({displayName: "UserForm",
     }
     var thisname = {name:$("#NameHere").val(),username:$("#UsernameHere").val(),password:$("#PasswordHere").val()}
     this.props.collection.create(thisname);
+      localStorage.setItem("UserName", $("#UsernameHere").val());
+      ReactDOM.render(React.createElement(TheInput, {collection: myCollection, model: myModel}),document.getElementById("container"))
   },
   render: function(){
     return(
@@ -100,6 +144,9 @@ var UserForm = React.createClass({displayName: "UserForm",
 });
 
 var LogForm = React.createClass({displayName: "LogForm",
+  handleNew:function(){
+    ReactDOM.render(React.createElement(UserForm, {collection: this.props.collection}),document.getElementById("container"))
+  },
   handleSubmit:function(e){
     e.preventDefault();
     var CurUsername = $("#UsernameHere").val();
@@ -119,24 +166,27 @@ var LogForm = React.createClass({displayName: "LogForm",
             } else{
               myCollection.fetch();
               ReactDOM.render(React.createElement(TheInput, {CurrentUser: CurUsername, collection: myCollection, model: myModel}),document.getElementById("container"))
+              localStorage.setItem("UserName", CurUsername);
             }
       })
   },
     render:function(){
+      var curUser = localStorage.getItem("UserName");
         return(
           React.createElement("div", {className: "Login"}, 
           React.createElement("label", null, "Sign In"), 
-          React.createElement("form", {onSubmit: this.handleSubmit}, 
+          React.createElement("form", null, 
               React.createElement("input", {type: "text", id: "UsernameHere", placeholder: "UserName"}), 
-              React.createElement("input", {type: "text", id: "PasswordHere", placeholder: "Password"}), 
-              React.createElement("button", {className: "btn btn-primary"}, "Log In")
-          )
+              React.createElement("input", {type: "text", id: "PasswordHere", placeholder: "Password"})
+          ), 
+          React.createElement("div", null, React.createElement("button", {onClick: this.handleSubmit, className: "btn btn-primary"}, "Log In"), 
+          React.createElement("button", {onClick: this.handleNew, className: "btn btn-secondary"}, "Create New"))
           )
         )
     },
 })
 
-module.exports=UserForm;
+module.exports=LogForm;
 
 },{"../model/model.js":4,"./input.jsx":1,"backbone":14,"jquery":63,"react":203,"react-bootstrap/lib/Input":69}],3:[function(require,module,exports){
 "use strict";
@@ -156,14 +206,21 @@ var myModel = new Model.Model();
 var UserModel= new Model.UserModel();
 var UserModelCollection= new Model.UserModelCollection();
 
+var curUser = localStorage.getItem("UserName");
+
   myCollection.fetch();
-setInterval(function(){
-  myCollection.fetch();
-},30000)
+  // setInterval(function(){
+  //   this.props.collection.fetch().done(function(){
+  //     ReactDOM.render(<TheInput />,document.getElementById("container"))
+  //   })
+  //
+  // },3000)
 
 
 //ReactDOM.render(<TheInput collection={myCollection} model={myModel}/>,document.getElementById("container"))
-ReactDOM.render(React.createElement(UserForm, {collection: UserModelCollection, model: UserModel}),document.getElementById("container"))
+ReactDOM.render(
+  React.createElement(UserForm, {collection: UserModelCollection, model: UserModel})
+,document.getElementById("container"))
 
 },{"./component/input.jsx":1,"./component/username.jsx":2,"./model/model.js":4,"backbone":14,"backbone-react-component":13,"jquery":63,"react":203}],4:[function(require,module,exports){
 "use strict";
@@ -173,13 +230,13 @@ var Backbone = require("backbone");
 var $ = require("jquery")
 
 var Model = Backbone.Model.extend({
-urlRoot:"http://tiny-lasagna-server.herokuapp.com/collections/messages-Jake",
+urlRoot:"http://tiny-lasagna-server.herokuapp.com/collections/messages",
    idAttribute: "_id",
 });
 
 var ModelCollection = Backbone.Collection.extend({
   model:Model,
-  url:"http://tiny-lasagna-server.herokuapp.com/collections/messages-Jake",
+  url:"http://tiny-lasagna-server.herokuapp.com/collections/messages",
 });
 
 var UserModel = Backbone.Model.extend({
